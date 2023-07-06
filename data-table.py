@@ -5,6 +5,13 @@ import StringIO
 import yaml
 from collections import OrderedDict
 
+# make all yaml dicts ordered
+# based on https://stackoverflow.com/a/21048064
+yaml.add_constructor(
+	yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+	lambda loader, node: OrderedDict(loader.construct_pairs(node))
+)
+
 class DataTableMacro(WikiMacroBase):
 	'''
 	Renders YAML document as a table.
