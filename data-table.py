@@ -68,10 +68,14 @@ class DataTableMacro(WikiMacroBase):
 		for row, row_data in data.items():
 			out.write('<tr><th>%s</th>' % Markup.escape(row))
 			for col in cols:
-				out.write('<td>')
-				cell = unicode(row_data.get(col, ''))
-				Formatter(self.env, formatter.context).format(cell, out)
-				out.write('</td>')
+				if col in row_data:
+					out.write('<td>')
+					cell = unicode(row_data[col])
+					Formatter(self.env, formatter.context).format(cell, out)
+					out.write('</td>')
+				else:
+					# TODO class
+					out.write('<td style="background-color: #ddd;"></td>')
 			out.write('</tr>')
 
 		out.write('</table>')
