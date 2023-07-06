@@ -31,19 +31,20 @@ class DataTableMacro(WikiMacroBase):
 		if not isinstance(data, dict):
 			raise Exception('top-level should be a dict')
 
-		cols = OrderedDict()
+		cols = data.pop('_columns', OrderedDict())
 		for row, row_data in data.items():
 			if not isinstance(row_data, dict):
 				raise Exception('row %s should be a dict' % row)
 			for col in row_data.keys():
-				cols[col] = col
+				if col not in cols:
+					cols[col] = col
 
 		out = StringIO.StringIO()
 
 		out.write('<table class="wiki">')
 
 		out.write('<tr><th></th>')
-		for col in cols:
+		for col in cols.values():
 			out.write('<th>')
 			out.write(Markup.escape(col))
 			out.write('</th>')
