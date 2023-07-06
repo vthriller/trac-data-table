@@ -5,13 +5,19 @@ import StringIO
 import yaml
 from collections import OrderedDict
 
+class UniqOrderedDict(OrderedDict):
+	def __setitem__(self, k, v):
+		if k in self:
+			raise Exception('%r is defined multiple times' % k)
+		OrderedDict.__setitem__(self, k, v)
+
 # make all yaml dicts ordered
 # based on https://stackoverflow.com/a/21912744
 class OrderedLoader(yaml.SafeLoader):
 	pass
 def construct_mapping(loader, node):
 	loader.flatten_mapping(node)
-	return OrderedDict(loader.construct_pairs(node))
+	return UniqOrderedDict(loader.construct_pairs(node))
 OrderedLoader.add_constructor(
 	yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
         construct_mapping,
