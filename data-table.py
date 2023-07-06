@@ -3,6 +3,7 @@ from trac.util.html import Markup
 from trac.wiki import Formatter
 import StringIO
 import yaml
+from collections import OrderedDict
 
 class DataTableMacro(WikiMacroBase):
 	'''
@@ -18,11 +19,12 @@ class DataTableMacro(WikiMacroBase):
 		if not isinstance(data, dict):
 			raise Exception('top-level should be a dict')
 
-		cols = set()
+		cols = OrderedDict()
 		for row, row_data in data.items():
 			if not isinstance(row_data, dict):
 				raise Exception('row %s should be a dict' % row)
-			cols.update(row_data.keys())
+			for col in row_data.keys():
+				cols[col] = col
 
 		out = StringIO.StringIO()
 
