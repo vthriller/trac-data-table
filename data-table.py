@@ -17,7 +17,22 @@ class OrderedLoader(yaml.SafeLoader):
 	pass
 def construct_mapping(loader, node):
 	loader.flatten_mapping(node)
-	return UniqOrderedDict(loader.construct_pairs(node))
+	output = UniqOrderedDict()
+
+	# this is like loader.construct_pairs(), except this loop also checks if key already exists
+	# we check for collision here and not in the dict to raise nicer exceptions
+	for knode, vnode in node.value:
+		k = loader.construct_object(knode, deep=False)
+		v = loader.construct_object(vnode, deep=False)
+		if k in output:
+			raise yaml.constructor.ConstructorError(
+				'while constructing a mapping',
+				node.start_mark,
+				'%r is defined multiple times' % k,
+				knode.start_mark,
+			)
+		output[k] = v
+	return output
 OrderedLoader.add_constructor(
 	yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
         construct_mapping,
