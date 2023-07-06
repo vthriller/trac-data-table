@@ -6,10 +6,15 @@ import yaml
 from collections import OrderedDict
 
 # make all yaml dicts ordered
-# based on https://stackoverflow.com/a/21048064
-yaml.add_constructor(
+# based on https://stackoverflow.com/a/21912744
+class OrderedLoader(yaml.SafeLoader):
+	pass
+def construct_mapping(loader, node):
+	loader.flatten_mapping(node)
+	return OrderedDict(loader.construct_pairs(node))
+OrderedLoader.add_constructor(
 	yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
-	lambda loader, node: OrderedDict(loader.construct_pairs(node))
+        construct_mapping,
 )
 
 class DataTableMacro(WikiMacroBase):
@@ -18,7 +23,7 @@ class DataTableMacro(WikiMacroBase):
 	'''
 	def expand_macro(self, formatter, name, text, args):
 		try:
-			data = yaml.safe_load(text)
+			data = yaml.load(text, OrderedLoader)
 		except Exception as e:
 			# show exception to the user, as-is
 			raise Exception(str(e))
