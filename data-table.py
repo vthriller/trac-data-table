@@ -73,9 +73,11 @@ class DataTableMacro(WikiMacroBase):
 					cell = unicode(row_data[col])
 					Formatter(self.env, formatter.context).format(cell, out)
 					out.write('</td>')
-				else:
+				elif (args.get('show_gaps') or '0') != '0':
 					# TODO class
 					out.write('<td style="background-color: #ddd;"></td>')
+				else:
+					out.write('<td></td>')
 			out.write('</tr>')
 
 		out.write('</table>')
